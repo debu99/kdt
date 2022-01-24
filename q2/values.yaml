@@ -1,0 +1,46 @@
+app:
+  env: dev
+  name: litecoin
+
+image:
+  replicas: 1
+  envSecret: false
+  repo: debu99/litecoin
+  tag: latest
+  imagePullPolicy: "Always"
+
+  securityContext:
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    runAsNonRoot: true
+
+  env:
+    LITECOIN_DATA: /home/litecoin/.litecoin
+
+  port:
+    litecoin: 9333
+    rpc: 9332
+    testnettcp: 19333
+    testnetrpc: 19332
+
+  healthCheckEnabled: true
+  healthCheckMode: tcp #tcp or grpc(for k8s v1.23 above only)
+  healthCheckPort: 9333
+
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "1000Mi"
+    limits:
+      cpu: "1200m"
+      memory: "1200Mi"
+
+service:
+  enabled: true
+
+pvc:
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClassName: "gp2"
+  mountPath: /home/litecoin/.litecoin

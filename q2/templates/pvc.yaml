@@ -1,0 +1,16 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.app.env }}-{{ .Values.app.name }}
+  labels:
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    release: {{ .Release.Name }}
+spec:
+  accessModes:
+    - {{ .Values.pvc.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.pvc.size | quote }}
+  storageClassName: "{{ .Values.pvc.storageClassName }}"

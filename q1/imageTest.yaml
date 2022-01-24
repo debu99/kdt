@@ -1,0 +1,22 @@
+schemaVersion: 2.0.0
+
+commandTests:
+  - name: "litecoin_data"
+    command: "echo"
+    args: ["$LITECOIN_DATA"]
+  - name: "path"
+    command: "which"
+    args: ["litecoind"]
+    expectedOutput: ["/usr/local/bin/litecoind"]
+  - name: "version"
+    command: "litecoind"
+    args: ["-version"]
+    expectedOutput: ["Litecoin Core Daemon version v0.18.1.*"]
+    exitCode: 0
+
+fileExistenceTests:
+  - name: "permission"
+    path: "/usr/local/bin/litecoind"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    isExecutableBy: "owner"

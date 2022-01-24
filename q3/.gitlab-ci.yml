@@ -1,0 +1,194 @@
+variables:
+  IMAGE_VERSION: ${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}
+  CONTAINER_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHORT_SHA}
+  CONTAINER_IMAGE_LATEST: ${CI_REGISTRY_IMAGE}:latest
+
+stages:
+  - build
+  - test
+  - push
+  - deploy
+
+.template: &template
+  image: 
+    name: docker:19.03
+  services:
+    - name: docker:19.03.13-dind
+      command: ["--mtu=1300"]
+  before_script:
+    - apk add --no-cache docker-cli
+    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  after_script:
+    - echo "[INFO] Task completed on `date`"
+  #when: manual
+
+
+.dockerdaemon_variable: &dockerdaemon_variable
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+lint:
+  stage: build
+  image: 
+    name: hadolint/hadolint:latest-debian
+  after_script:
+    - echo "[INFO] Task completed on `date`"
+  script:
+    - /bin/hadolint -t error docker/Dockerfile
+  #when: manual
+
+build:
+  stage: build
+  <<: *template
+  variables:
+    <<: *dockerdaemon_variable
+  script:
+    - docker build -t ${CONTAINER_IMAGE} -f ./docker/Dockerfile ./docker/
+    - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE_LATEST}
+    - docker images
+    - docker push ${CONTAINER_IMAGE}
+    - docker push ${CONTAINER_IMAGE_LATEST}
+
+container_test:
+  stage: test
+  <<: *template
+  variables:
+    <<: *dockerdaemon_variable
+  script:
+    - apk add --no-cache curl
+    - curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+    - docker pull ${CONTAINER_IMAGE}
+    - container-structure-test test --image ${CONTAINER_IMAGE} -c ./docker/imageTest.yaml
+
+local_test:
+  stage: test
+  <<: *template
+  variables:
+    <<: *dockerdaemon_variable
+  script:
+    - docker pull ${CONTAINER_IMAGE}
+    - docker run -d --name test -p 9333:9333 ${CONTAINER_IMAGE}
+    - docker ps
+    - |
+      export failed=1
+      for i in `seq 1 30`; do
+        if `nc -vv -w 2 localhost 9333`; then 
+          echo "[INFO] netcat returns ${ret}, continue..."
+          failed=0
+          break
+        else 
+          echo "[INFO] netcat returns ${ret}, retry..."
+          sleep 1
+        fi
+      done
+    - if [ $failed -eq 1 ]; then echo "[ERROR] Healthcheck failed on local"; docker logs test; exit 1; fi
+
+image_scan:
+  stage: test
+  <<: *template
+  variables:
+    <<: *dockerdaemon_variable
+    GIT_STRATEGY: none
+    TRIVY_VERSION: v0.22.0
+  script:
+    - apk add --no-cache curl jq
+    - docker pull ${CONTAINER_IMAGE}
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin ${TRIVY_VERSION}
+    - curl -sSL -o /tmp/trivy-gitlab.tpl https://github.com/aquasecurity/trivy/raw/${TRIVY_VERSION}/contrib/gitlab.tpl
+    - trivy --exit-code 0 --cache-dir .trivycache/ --severity HIGH --no-progress --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report-high.json $CONTAINER_IMAGE
+    - trivy --exit-code 0 --cache-dir .trivycache/ --severity CRITICAL --no-progress --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report-critical.json $CONTAINER_IMAGE
+    - cat gl-container-scanning-report*.json
+    - |
+      if [ `cat gl-container-scanning-report-high.json | jq '.vulnerabilities|length'` -ne 0 ]; then
+        echo '[ERROR] Found high vulnerability...'
+        exit 1
+      else
+        echo "[INFO] No high vulnerability..."
+      fi
+      if [ `cat gl-container-scanning-report-critical.json | jq '.vulnerabilities|length'` -ne 0 ]; then
+        echo '[ERROR] Found critical vulnerability...'
+        exit 1
+      else
+        echo "[INFO] No critical vulnerability..."
+      fi
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report-critical.json
+
+push:
+  stage: push
+  <<: *template
+  variables:
+    <<: *dockerdaemon_variable
+    GIT_STRATEGY: none
+  script:
+    - docker pull ${CONTAINER_IMAGE}
+    - docker tag ${CONTAINER_IMAGE} debu99/litecoin:${IMAGE_VERSION}
+    - docker tag ${CONTAINER_IMAGE} debu99/litecoin:latest
+    - docker login -u ${DOCKERHUB_LOGIN} -p ${DOCKERHUB_CREDENTIAL} ${DOCKERHUB_REGISTRY}
+    - docker push debu99/litecoin:${IMAGE_VERSION}
+    - docker push debu99/litecoin:latest
+
+deploy:
+  stage: deploy
+  image:
+    name: docker:19.03
+  variables:
+    GIT_STRATEGY: none
+  after_script:
+    - echo "[INFO] Task completed on `date`"
+  script:
+    - apk add --no-cache git aws-cli yq jq
+    - git config --global user.email "vincent@doctoranywhere.com"
+    - git config --global user.name "GITLAB_CICD"
+    - git clone https://oauth2:${ARGOCD_TOKEN}@${ARGOCD_REPO}
+    - cd argocd_eks
+    - echo "[INFO] IMAGE_VERSION=${IMAGE_VERSION}"
+    - yq r da-eks-test/litecoin/values.yaml 'image.tag' 
+    - yq w -i da-eks-test/litecoin/values.yaml 'image.tag' "${IMAGE_VERSION}"
+    - yq r da-eks-test/litecoin/values.yaml 'image.tag' 
+    - git add da-eks-test/litecoin/values.yaml
+    - git commit -m "Update litecoin tag to ${IMAGE_VERSION}" || true
+    - git push
+    - wget https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl
+    - chmod +x /usr/local/bin/kubectl
+    - |
+      aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      aws configure set region $AWS_DEFAULT_REGION
+    - aws configure list
+    - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $KUBE_NAME
+    - kubectl config current-context
+    - kubectl version
+    - wget https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 -O /usr/local/bin/argocd
+    - chmod +x /usr/local/bin/argocd
+    - argocd login cd.argoproj.io --core
+    - kubectl config set-context --current --namespace=argocd
+    - argocd app sync argocd-applications
+    - argocd app sync litecoin
+    - kubectl config set-context --current --namespace=default
+    - |
+      export failed=1
+      echo "[DEBUG] failed=${failed}"
+      for i in `seq 1 60`; do
+        echo "[DEBUG] i=${i}"
+        PODS=`kubectl get pod -l app=litecoin --no-headers | grep '1/1' | wc -l | xargs` || true
+        echo "[DEBUG] PODS=${PODS}"
+        IMAGE_TAG=`kubectl get pod test-litecoin-0 -o json | jq -re '.spec.containers[0].image'` || true
+        echo "[DEBUG] IMAGE_TAG=${IMAGE_TAG}"
+        if [ $PODS -eq 1 ] && [ $IMAGE_TAG == "debu99/litecoin:${IMAGE_VERSION}" ]; then 
+          echo "[INFO] get pod image = ${IMAGE_TAG} number = ${PODS}, continue..."
+          failed=0
+          break
+        else 
+          echo "[INFO] get pod number = ${PODS}, retry..."
+          kubectl get pod -l app=litecoin --no-headers
+          sleep 6
+        fi
+      done
+    - if [ $failed -eq 1 ]; then echo "[ERROR] Healthcheck failed on local"; docker logs test; exit 1; fi
+    - kubectl get pod -l app=litecoin
+
+

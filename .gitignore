@@ -1,0 +1,6 @@
+.terraform.*
+terraform.tfstate*
+.terraform
+__pycache__
+*.Alpine
+.DS_Store
