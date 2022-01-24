@@ -4,7 +4,7 @@ This terraform module is used to create IAM assume role and IAM group that able 
 
 ## Folder Structure
 
-
+```
 /
 │   README.md
 └───modules
@@ -18,6 +18,7 @@ This terraform module is used to create IAM assume role and IAM group that able 
         └───main.tf
     └───create_iam_user_with_existing_role_and_group
         └───main.tf
+```
 
 | File/Folder | Usage |
 | ------ | ------ |
