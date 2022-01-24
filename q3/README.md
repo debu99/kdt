@@ -5,9 +5,9 @@ Create CICD for stateful deployment
 ```
 /
 └───q3
-    └───.gitlab-ci.yaml
+    └───.gitlab-ci.yml
     └───docker
-        └───docker-entrypoint.yaml
+        └───docker-entrypoint.sh
         └───Dockerfile
         └───gosu.public.key
         └───litecoin.public.key
@@ -17,8 +17,8 @@ Create CICD for stateful deployment
 
 | File/Folder | Usage |
 | ------ | ------ |
-| [.gitlab-ci.yaml](./.gitlab-ci.yaml) | Gitlab CICD pipeline yaml |
-| [docker/docker-entrypoint.yaml](./docker/docker-entrypoint.yaml) | Entrypoint file for litecoin docker image |
+| [.gitlab-ci.yml](./.gitlab-ci.yml) | Gitlab CICD pipeline yaml |
+| [docker/docker-entrypoint.sh](./docker/docker-entrypoint.sh) | Entrypoint file for litecoin docker image |
 | [docker/Dockerfile](./docker/Dockerfile) | Docker file for litecoin |
 | [docker/imageTest.yaml](./docker/imageTest.yaml) | Configuration file for container-structure-test |
 | [docker/gosu.public.key](./docker/gosu.public.key) | Public key for gosu |
