@@ -28,7 +28,7 @@ This terraform module is used to create IAM assume role and IAM group that able 
 | [modules/iam/vars.tf](./modules/iam/vars.tf) | Inputs for the Terraform module |
 | [modules/iam/version.tf](./modules/iam/version.tf) | Version definition for the Terraform module |
 | [examples/create_iam_role_group_user/main.tf](./examples/create_iam_role_group_user/main.tf) | Example file that create IAM assume role, group and user with the module |
-| [examples/create_iam_user_with_existing_role_and_group/main.tf](./examples/create_iam_role_group_user/main.tf) | Example file that only create IAM user with the module |
+| [examples/create_iam_user_with_existing_role_and_group/main.tf](./examples/create_iam_user_with_existing_role_and_group/main.tf) | Example file that only create IAM user with the module |
 
 ## Requirements
 
