@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM ubuntu:20.04
 
 ENV LITECOIN_USER=litecoin
 RUN useradd -r ${LITECOIN_USER} \

@@ -1,9 +1,10 @@
 #!/bin/bash
+set -e
 
 IMAGE_NAME=debu99/litecoin
 IMAGE_TAG=0.0.1
 
-docker run --rm -i hadolint/hadolint < Dockerfile
+docker run --rm -i -v $PWD:/app --entrypoint /bin/hadolint hadolint/hadolint -t error /app/Dockerfile
 
 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
 
