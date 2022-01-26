@@ -32,7 +32,7 @@ This terraform module is used to create IAM assume role and IAM group that able 
 | [modules/iam/outputs.tf](./modules/iam/outputs.tf) | Outputs for the Terraform module |
 | [modules/iam/vars.tf](./modules/iam/vars.tf) | Inputs for the Terraform module |
 | [modules/iam/version.tf](./modules/iam/version.tf) | Version definition for the Terraform module |
-| [modules/iam/run.sh](./modules/iam/run.sh) | Bash script to check the syntax error |
+| [modules/iam/run.sh](./modules/iam/run.sh) | Bash script to rewrite terraform format |
 | [examples/create_iam_role_group_user/main.tf](./examples/create_iam_role_group_user/main.tf) | Example file that create IAM assume role, group and user with the module |
 | [examples/create_iam_role_group_user/.tflint.tf](./examples/create_iam_role_group_user/.tflint.tf) | Config file for tflint |
 | [examples/create_iam_role_group_user/run.sh](./examples/create_iam_role_group_user/run.sh) | Bash script to run the terraform |

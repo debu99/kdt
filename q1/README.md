@@ -100,7 +100,7 @@ VOLUME ["/home/litecoin/.litecoin"]
 
  ENTRYPOINT ["/entrypoint.sh"]
 
- +HEALTHCHECK CMD netstat -ltn | grep -c 9083
++HEALTHCHECK CMD netstat -ltn | grep -c 9083
  ```
 - Change base image from debian to ubuntu 20.04 to remove vulnerabilities
 - Add some network and debug tools
