@@ -37,3 +37,5 @@ USER ${LITECOIN_USER}
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["litecoind"]
+
+HEALTHCHECK CMD netstat -ltn | grep -c 9083

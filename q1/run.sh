@@ -6,6 +6,8 @@ IMAGE_TAG=0.0.1
 
 docker run --rm -i -v $PWD:/app --entrypoint /bin/hadolint hadolint/hadolint -t error /app/Dockerfile
 
+docker run --tty -v $(pwd):/data bridgecrew/checkov --directory /data
+
 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
 
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --severity "HIGH,CRITICAL" --exit-code 1 ${IMAGE_NAME}:${IMAGE_TAG}

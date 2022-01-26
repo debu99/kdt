@@ -37,7 +37,15 @@ lint:
     - echo "[INFO] Task completed on `date`"
   script:
     - /bin/hadolint -t error docker/Dockerfile
-  #when: manual
+
+static_analysis:
+  stage: build
+  image: 
+    name: bridgecrew/checkov
+  after_script:
+    - echo "[INFO] Task completed on `date`"
+  script:
+    - /usr/local/bin/checkov --skip-check CKV_DOCKER_2 --directory ./docker
 
 build:
   stage: build
@@ -190,5 +198,3 @@ deploy:
       done
     - if [ $failed -eq 1 ]; then echo "[ERROR] Healthcheck failed on local"; docker logs test; exit 1; fi
     - kubectl get pod -l app=litecoin
-
-

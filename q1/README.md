@@ -99,6 +99,8 @@ VOLUME ["/home/litecoin/.litecoin"]
 +USER ${LITECOIN_USER}
 
  ENTRYPOINT ["/entrypoint.sh"]
+
+ +HEALTHCHECK CMD netstat -ltn | grep -c 9083
  ```
 - Change base image from debian to ubuntu 20.04 to remove vulnerabilities
 - Add some network and debug tools
@@ -106,3 +108,4 @@ VOLUME ["/home/litecoin/.litecoin"]
 - Fix entrypoint.sh permission issue
 - Run as normal user instead of root
 - Remove [unused port](https://github.com/litecoin-project/litecoin/blob/master/doc/litecoin-release-notes/release-notes-0.10.2.2.md) from expose
+- Add healthcheck for container

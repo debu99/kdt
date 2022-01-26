@@ -13,11 +13,16 @@ This terraform module is used to create IAM assume role and IAM group that able 
         └───outputs.tf
         └───vars.tf
         └───version.tf
+        └───run.sh
 └───examples
     └───create_iam_role_group_user
         └───main.tf
+        └───.tflint.tf
+        └───run.sh
     └───create_iam_user_with_existing_role_and_group
         └───main.tf
+        └───.tflint.tf
+        └───run.sh
 ```
 
 | File/Folder | Usage |
@@ -27,8 +32,13 @@ This terraform module is used to create IAM assume role and IAM group that able 
 | [modules/iam/outputs.tf](./modules/iam/outputs.tf) | Outputs for the Terraform module |
 | [modules/iam/vars.tf](./modules/iam/vars.tf) | Inputs for the Terraform module |
 | [modules/iam/version.tf](./modules/iam/version.tf) | Version definition for the Terraform module |
+| [modules/iam/run.sh](./modules/iam/run.sh) | Bash script to check the syntax error |
 | [examples/create_iam_role_group_user/main.tf](./examples/create_iam_role_group_user/main.tf) | Example file that create IAM assume role, group and user with the module |
+| [examples/create_iam_role_group_user/.tflint.tf](./examples/create_iam_role_group_user/.tflint.tf) | Config file for tflint |
+| [examples/create_iam_role_group_user/run.sh](./examples/create_iam_role_group_user/run.sh) | Bash script to run the terraform |
 | [examples/create_iam_user_with_existing_role_and_group/main.tf](./examples/create_iam_user_with_existing_role_and_group/main.tf) | Example file that only create IAM user with the module |
+| [examples/create_iam_user_with_existing_role_and_group/.tflint.tf](./examples/create_iam_user_with_existing_role_and_group/.tflint.tf) | Config file for tflint |
+| [examples/create_iam_user_with_existing_role_and_group/run.sh](./examples/create_iam_user_with_existing_role_and_group/run.sh) | Bash script to run the terraform |
 
 ## Requirements
 

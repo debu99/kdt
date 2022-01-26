@@ -31,6 +31,7 @@ ArgoCD:
 
 ## CI
 - lint: Check Dockerfile syntax error
+- static_analysis: Static code scan for Dockerfile 
 - build: Containerize application
 - container_test: Check docker image is properly created
 - local_test: Start container and do healthcheck
