@@ -1,6 +1,7 @@
 #!/bin/bash
 
 REGION="ap-southeast-1"
+PROFILE_NAME="rnd"
 
 terraform fmt
 terraform validate
@@ -19,4 +20,4 @@ terraform apply
 #docker run -it -v $PWD:/app -v $HOME/.aws:/root/.aws -w /app --rm chef/inspec:4.52.9 init profile --platform aws inspec-profile --chef-license=accept
 mkdir -p inspec-profile/files
 terraform output --json > inspec-profile/files/output.json 
-docker run -it -v $PWD:/app -v $HOME/.aws:/root/.aws -w /app --rm chef/inspec:4.52.9 exec inspec-profile -t aws://${REGION}/rnd --chef-license=accept
+docker run -it -v $PWD:/app -v $HOME/.aws:/root/.aws -w /app --rm chef/inspec:4.52.9 exec inspec-profile -t aws://${REGION}/${PROFILE_NAME} --chef-license=accept
