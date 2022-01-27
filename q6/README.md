@@ -19,10 +19,12 @@ This terraform module is used to create IAM assume role and IAM group that able 
         └───main.tf
         └───.tflint.tf
         └───run.sh
+        └───inspec-profile
     └───create_iam_user_with_existing_role_and_group
         └───main.tf
         └───.tflint.tf
         └───run.sh
+        └───inspec-profile
 ```
 
 | File/Folder | Usage |
@@ -36,9 +38,11 @@ This terraform module is used to create IAM assume role and IAM group that able 
 | [examples/create_iam_role_group_user/main.tf](./examples/create_iam_role_group_user/main.tf) | Example file that create IAM assume role, group and user with the module |
 | [examples/create_iam_role_group_user/.tflint.tf](./examples/create_iam_role_group_user/.tflint.tf) | Config file for tflint |
 | [examples/create_iam_role_group_user/run.sh](./examples/create_iam_role_group_user/run.sh) | Bash script to run the terraform |
+| [examples/create_iam_role_group_user/inspec-profile](./examples/create_iam_role_group_user/inspec-profile) | inspec profile for terraform test |
 | [examples/create_iam_user_with_existing_role_and_group/main.tf](./examples/create_iam_user_with_existing_role_and_group/main.tf) | Example file that only create IAM user with the module |
 | [examples/create_iam_user_with_existing_role_and_group/.tflint.tf](./examples/create_iam_user_with_existing_role_and_group/.tflint.tf) | Config file for tflint |
 | [examples/create_iam_user_with_existing_role_and_group/run.sh](./examples/create_iam_user_with_existing_role_and_group/run.sh) | Bash script to run the terraform |
+| [examples/create_iam_user_with_existing_role_and_group/inspec-profile](./examples/create_iam_user_with_existing_role_and_group/inspec-profile) | inspec profile for terraform test |
 
 ## Requirements
 

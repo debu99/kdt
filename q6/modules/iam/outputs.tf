@@ -3,6 +3,11 @@ output "iam_assume_role_arn" {
   value       = var.enabled ? local.assume_role_arn : null
 }
 
+output "iam_role" {
+  description = "IAM role name created/used by this module"
+  value       = var.enabled ? split("/", local.assume_role_arn)[1] : null
+}
+
 output "iam_group" {
   description = "IAM group name created/used by this module"
   value       = var.enabled ? local.group_name : null
@@ -11,6 +16,11 @@ output "iam_group" {
 output "iam_user" {
   description = "IAM user name created by this module"
   value       = var.enabled ? aws_iam_user.this[0].name : null
+}
+
+output "iam_group_policy" {
+  description = "IAM group policy name created by this module"
+  value = var.enabled && var.iam_group.create_iam_group ? aws_iam_group_policy.this[0].name : null
 }
 
 output "aws_access_key_id" {

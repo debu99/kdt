@@ -12,12 +12,20 @@ output "iam_assume_role_arn" {
   value = module.test.iam_assume_role_arn
 }
 
+output "iam_role" {
+  value = module.test.iam_role
+}
+
 output "iam_group" {
   value = module.test.iam_group
 }
 
 output "iam_user" {
   value = module.test.iam_user
+}
+
+output "iam_group_policy" {
+  value = module.test.iam_group_policy
 }
 
 output "aws_access_key_id" {

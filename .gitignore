@@ -5,3 +5,4 @@ __pycache__
 backup
 .DS_Store
 .tflint.d
+output.json
