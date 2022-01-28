@@ -38,4 +38,4 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["litecoind"]
 
-HEALTHCHECK CMD netstat -ltn | grep -c 9083
+HEALTHCHECK CMD netstat -ltn | grep -c 9332
